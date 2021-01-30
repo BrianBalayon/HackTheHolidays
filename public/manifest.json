@@ -1,6 +1,6 @@
 {
-  "short_name": "Token Recovery",
-  "name": "Token Recovery Tool",
+  "short_name": "React App",
+  "name": "Create React App Sample",
   "icons": [
     {
       "src": "favicon.ico",

@@ -6,7 +6,7 @@ import { useMetaMaskBalances } from "./utils/getbalances.js";
 import { theme } from "./theme";
 import TokenCard from "./components/tokencard.js";
 import getTknVals from "./utils/tknvals.js";
-import { Box, Typography, makeStyles } from "@material-ui/core";
+import { Box, Typography, makeStyles, Button } from "@material-ui/core";
 import Web3 from "web3";
 
 const ethDets = { decimals: 18, name: "Ethereum", symbol: "ETH" };
@@ -115,13 +115,21 @@ function App() {
                <Box className={classes.container}>
                   <Typography variant={"h1"}>Token Recovery Tool</Typography>
                   <Typography variant={"body2"}>
-                     Scan for MetaMask suppoerted ERC-20 tokens held by your
+                     Scan for MetaMask supported ERC-20 tokens held by your
                      address and add them to your watch list.
                   </Typography>
                   <Typography variant={"body2"}>
                      If you see no tokens listed, you have to enable MetaMask to
                      connect.
                   </Typography>
+                  <Button
+                     onClick={async () => {
+                        await window.ethereum.request({
+                           method: "eth_requestAccounts",
+                        });
+                     }}>
+                     CONNECT
+                  </Button>
                </Box>
                {Object.keys(balances).map((tkn) => {
                   return <TokenCard token={balances[tkn]} />;

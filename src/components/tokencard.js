@@ -12,7 +12,7 @@ import { addToWallet } from "../utils/addToWallet.js";
 
 const useStyles = makeStyles((theme) => ({
    root: {},
-   card: {
+   container: {
       height: "100%",
       width: "85%",
       margin: "auto",
