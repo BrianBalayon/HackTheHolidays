@@ -1,2 +1,12 @@
-# HackTheHolidays
-This repository is for the participants and viewers of the 2020 HackTheHolidays occurring on the 18-20 of December. Please head to https://hackathon.blockchaincenter.com to register.
+# hack2101
+For the Blockchain Center's 2021 Miami Blockchain Week Hackathon 
+
+## To run
+
+run `npm i`
+run `npm start`
+
+## Requirements
+
+-   a web browser
+-   MetaMask
