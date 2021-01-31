@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^12.1.10",
     "@web3-react/core": "^6.1.1",
     "axios": "^0.21.1",
+    "d3": "^6.5.0",
     "ethereumjs-util": "^7.0.7",
     "ethers": "^5.0.26",
     "react": "^17.0.1",

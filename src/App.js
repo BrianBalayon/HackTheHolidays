@@ -15,7 +15,7 @@ import {
    Switch,
    Grid,
 } from "@material-ui/core";
-import Web3 from "web3";
+import ChartCard from "./components/chartcard.js";
 
 const ethDets = { decimals: 18, name: "Ethereum", symbol: "ETH" };
 
@@ -24,8 +24,7 @@ const useStyles = makeStyles((theme) => ({
    container: {
       height: "100%",
       width: "85%",
-      margin: theme.spacing(3),
-      margin: "auto",
+      margin: theme.spacing(5),
       padding: theme.spacing(3),
    },
    vSpace: {
@@ -95,7 +94,7 @@ function App() {
 
             let chain = await ethereum.request({ method: "eth_chainId" });
             if (chain !== "0x1") {
-               throw "wrong chain";
+               throw new Error("wrong chain");
             }
 
             if (show === 1) {
@@ -134,12 +133,14 @@ function App() {
                   address: tkn,
                };
             }
+            return null;
          });
          Object.keys(vals).map((tkn) => {
             toSet[tkn] = {
                ...toSet[tkn],
                conv: vals[tkn],
             };
+            return null;
          });
          toSet = await calcValues(toSet);
          setBalances(toSet);
@@ -159,27 +160,29 @@ function App() {
          currency.map((c) => {
             computed[c] = toSetAll[tkn].balance * convs[c];
             // console.log(convs[c]);
+            return null;
          });
          toSetAll[tkn] = { ...toSetAll[tkn], vals: computed };
          // console.log(toSetAll[tkn]);
+         return null;
       });
       console.log(toSetAll);
       // await setBalances(toSetAll);
       return toSetAll;
    };
 
-   const scan = async () => {
+   async function scan() {
       await connect();
       if (rightChain) {
          await GetBalances();
       }
-   };
+   }
 
-   useEffect(async () => {
+   useEffect(() => {
       scan();
    }, [show]);
 
-   useEffect(async () => {}, [balances]);
+   useEffect(() => {}, [balances]);
 
    return (
       <div className="App">
@@ -226,29 +229,35 @@ function App() {
                   </Typography>
                )}
                {show > 0 && (
-                  <div className={classes.vSpace5}>
-                     <Typography variant={"h3"}>
-                        Tokens Found Held by{" "}
-                        {window.ethereum.selectedAddress.slice(0, 6)}...
-                        {window.ethereum.selectedAddress.slice(
-                           window.ethereum.selectedAddress.length - 4
-                        )}
-                     </Typography>
-                     <Grid
-                        container
-                        direction="row"
-                        justify="space-evenly"
-                        alignItems="center">
-                        {Object.keys(balances).map((tkn) => {
-                           return (
-                              <TokenCard
-                                 showFiat={showFiat}
-                                 token={balances[tkn]}
-                              />
-                           );
-                        })}
-                     </Grid>
-                  </div>
+                  <>
+                     <div className={classes.vSpace5}>
+                        <ChartCard tokens={balances} />
+                     </div>
+                     <div className={classes.vSpace5}>
+                        <Typography variant={"h3"}>
+                           Tokens Found Held by{" "}
+                           {window.ethereum.selectedAddress.slice(0, 6)}...
+                           {window.ethereum.selectedAddress.slice(
+                              window.ethereum.selectedAddress.length - 4
+                           )}
+                        </Typography>
+                        <Grid
+                           container
+                           direction="row"
+                           justify="space-evenly"
+                           alignItems="center">
+                           {Object.keys(balances).map((tkn, k) => {
+                              return (
+                                 <TokenCard
+                                    key={k}
+                                    showFiat={showFiat}
+                                    token={balances[tkn]}
+                                 />
+                              );
+                           })}
+                        </Grid>
+                     </div>
+                  </>
                )}
             </Box>
          </ThemeProvider>

@@ -9,13 +9,14 @@ import {
    Button,
    Grid,
    Link,
+   ButtonGroup,
 } from "@material-ui/core";
 import { addToWallet } from "../utils/addToWallet.js";
 import LaunchIcon from "@material-ui/icons/Launch";
 import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 
 const useStyles = makeStyles((theme) => ({
-   root: { height: "72pt" },
+   root: {},
    card: {
       // height: "130pt",
       // width: "85%",
@@ -53,40 +54,41 @@ const TokenCard = ({ className, token, showFiat }) => {
                            {token.vals.eth} ETH
                         </Typography>
                      )}
-                     <Button
+                     <ButtonGroup
+                        disableElevation
                         className={classes.vSpace2}
-                        color="primary"
-                        variant="contained"
-                        startIcon={<AccountBalanceWalletIcon />}
-                        onClick={() => {
-                           try {
-                              addToWallet(
-                                 token.address,
-                                 token.symbol,
-                                 token.decimals
-                              );
-                           } catch {}
-                        }}>
-                        Add {token.symbol} to Wallet
-                     </Button>
-                     <Link
-                        color={"inherit"}
-                        rel={"noopener noreferrer"}
-                        target={"_blank"}
-                        href={
-                           "https://etherscan.io/token/" +
-                           token.address +
-                           "?a=" +
-                           window.ethereum.selectedAddress
-                        }>
+                        orientation={"vertical"}>
                         <Button
-                           className={classes.vSpace}
+                           color="primary"
+                           variant="contained"
+                           startIcon={<AccountBalanceWalletIcon />}
+                           onClick={() => {
+                              try {
+                                 addToWallet(
+                                    token.address,
+                                    token.symbol,
+                                    token.decimals
+                                 );
+                              } catch {}
+                           }}>
+                           Add {token.symbol} to Wallet
+                        </Button>
+                        <Button
+                           component={"a"}
                            color="secondary"
                            variant="outlined"
+                           rel={"noopener noreferrer"}
+                           target={"_blank"}
+                           href={
+                              "https://etherscan.io/token/" +
+                              token.address +
+                              "?a=" +
+                              window.ethereum.selectedAddress
+                           }
                            startIcon={<LaunchIcon />}>
                            View on Etherscan
                         </Button>
-                     </Link>
+                     </ButtonGroup>
                   </>
                )}
             </CardContent>
