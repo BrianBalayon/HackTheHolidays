@@ -8,8 +8,11 @@ import {
    Typography,
    Button,
    Grid,
+   Link,
 } from "@material-ui/core";
 import { addToWallet } from "../utils/addToWallet.js";
+import LaunchIcon from "@material-ui/icons/Launch";
+import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 
 const useStyles = makeStyles((theme) => ({
    root: { height: "72pt" },
@@ -51,10 +54,10 @@ const TokenCard = ({ className, token, showFiat }) => {
                         </Typography>
                      )}
                      <Button
-                     className={classes.vSpace2} 
+                        className={classes.vSpace2}
                         color="primary"
                         variant="contained"
-                        startIcon={null}
+                        startIcon={<AccountBalanceWalletIcon />}
                         onClick={() => {
                            try {
                               addToWallet(
@@ -66,6 +69,24 @@ const TokenCard = ({ className, token, showFiat }) => {
                         }}>
                         Add {token.symbol} to Wallet
                      </Button>
+                     <Link
+                        color={"inherit"}
+                        rel={"noopener noreferrer"}
+                        target={"_blank"}
+                        href={
+                           "https://etherscan.io/token/" +
+                           token.address +
+                           "?a=" +
+                           window.ethereum.selectedAddress
+                        }>
+                        <Button
+                           className={classes.vSpace}
+                           color="secondary"
+                           variant="outlined"
+                           startIcon={<LaunchIcon />}>
+                           View on Etherscan
+                        </Button>
+                     </Link>
                   </>
                )}
             </CardContent>

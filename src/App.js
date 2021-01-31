@@ -28,6 +28,15 @@ const useStyles = makeStyles((theme) => ({
       margin: "auto",
       padding: theme.spacing(3),
    },
+   vSpace: {
+      marginTop: theme.spacing(1),
+   },
+   vSpace2: {
+      marginTop: theme.spacing(2),
+   },
+   vSpace5: {
+      marginTop: theme.spacing(5),
+   },
 }));
 
 function App() {
@@ -179,11 +188,12 @@ function App() {
                <Typography variant={"h1"}>Token Sweeper </Typography>
                {injected && rightChain && (
                   <div>
-                     <Typography variant={"body2"}>
+                     <Typography className={classes.vSpace} variant={"body2"}>
                         Scan for MetaMask supported ERC-20 tokens held by your
                         address and add them to your watch list.
                      </Typography>
                      <Button
+                        className={classes.vSpace}
                         color={"primary"}
                         variant={"contained"}
                         onClick={() => {
@@ -192,6 +202,7 @@ function App() {
                         Scan for Tokens
                      </Button>
                      <FormControlLabel
+                        className={classes.vSpace}
                         control={
                            <Switch
                               checked={showFiat}
@@ -205,30 +216,40 @@ function App() {
                   </div>
                )}
                {!injected && (
-                  <Typography variant={"body2"}>
+                  <Typography className={classes.vSpace} variant={"body2"}>
                      Please download and enable MetaMask
                   </Typography>
                )}
                {!rightChain && (
-                  <Typography variant={"body2"}>
+                  <Typography className={classes.vSpace} variant={"body2"}>
                      Please switch to the Ethereum Mainnet
                   </Typography>
                )}
-               <Grid
-                  container
-                  direction="row"
-                  justify="space-evenly"
-                  alignItems="center">
-                  {show > 0 &&
-                     Object.keys(balances).map((tkn) => {
-                        return (
-                           <TokenCard
-                              showFiat={showFiat}
-                              token={balances[tkn]}
-                           />
-                        );
-                     })}
-               </Grid>
+               {show > 0 && (
+                  <div className={classes.vSpace5}>
+                     <Typography variant={"h3"}>
+                        Tokens Found Held by{" "}
+                        {window.ethereum.selectedAddress.slice(0, 6)}...
+                        {window.ethereum.selectedAddress.slice(
+                           window.ethereum.selectedAddress.length - 4
+                        )}
+                     </Typography>
+                     <Grid
+                        container
+                        direction="row"
+                        justify="space-evenly"
+                        alignItems="center">
+                        {Object.keys(balances).map((tkn) => {
+                           return (
+                              <TokenCard
+                                 showFiat={showFiat}
+                                 token={balances[tkn]}
+                              />
+                           );
+                        })}
+                     </Grid>
+                  </div>
+               )}
             </Box>
          </ThemeProvider>
       </div>
