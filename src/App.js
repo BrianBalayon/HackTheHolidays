@@ -6,7 +6,15 @@ import { useMetaMaskBalances } from "./utils/getbalances.js";
 import { theme } from "./theme";
 import TokenCard from "./components/tokencard.js";
 import getTknVals from "./utils/tknvals.js";
-import { Box, Typography, makeStyles, Button, setRef } from "@material-ui/core";
+import {
+   Box,
+   Typography,
+   makeStyles,
+   Button,
+   FormControlLabel,
+   Switch,
+   Grid,
+} from "@material-ui/core";
 import Web3 from "web3";
 
 const ethDets = { decimals: 18, name: "Ethereum", symbol: "ETH" };
@@ -28,6 +36,11 @@ function App() {
    let [injected, setInjected] = useState(true);
    let [rightChain, setChain] = useState(true);
    let [show, setShow] = useState(0);
+   let [showFiat, setShowFiat] = useState(false);
+
+   const handleChangeShowMoney = () => {
+      setShowFiat(!showFiat);
+   };
 
    let allow = async () => {
       // MetaMask pop up
@@ -119,7 +132,7 @@ function App() {
                conv: vals[tkn],
             };
          });
-         toSet = await calcValues(toSet)
+         toSet = await calcValues(toSet);
          setBalances(toSet);
       });
    };
@@ -153,16 +166,11 @@ function App() {
       }
    };
 
-   // useEffect(() => {
-   //    scan();
-   // }, []);
-
    useEffect(async () => {
       scan();
    }, [show]);
 
-   useEffect(async () => {
-   }, [balances]);
+   useEffect(async () => {}, [balances]);
 
    return (
       <div className="App">
@@ -183,6 +191,17 @@ function App() {
                         }}>
                         Scan for Tokens
                      </Button>
+                     <FormControlLabel
+                        control={
+                           <Switch
+                              checked={showFiat}
+                              onChange={handleChangeShowMoney}
+                              name="Show Fiat Value"
+                              color="primary"
+                           />
+                        }
+                        label="Show Fiat Value"
+                     />
                   </div>
                )}
                {!injected && (
@@ -195,10 +214,21 @@ function App() {
                      Please switch to the Ethereum Mainnet
                   </Typography>
                )}
-               {show > 0 &&
-                  Object.keys(balances).map((tkn) => {
-                     return <TokenCard token={balances[tkn]} />;
-                  })}
+               <Grid
+                  container
+                  direction="row"
+                  justify="space-evenly"
+                  alignItems="center">
+                  {show > 0 &&
+                     Object.keys(balances).map((tkn) => {
+                        return (
+                           <TokenCard
+                              showFiat={showFiat}
+                              token={balances[tkn]}
+                           />
+                        );
+                     })}
+               </Grid>
             </Box>
          </ThemeProvider>
       </div>
