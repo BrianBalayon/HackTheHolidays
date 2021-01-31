@@ -45,6 +45,7 @@ function App() {
    let [rightChain, setChain] = useState(true);
    let [show, setShow] = useState(0);
    let [showFiat, setShowFiat] = useState(false);
+   let [address, setAddress] = useState("");
 
    const handleChangeShowMoney = () => {
       setShowFiat(!showFiat);
@@ -104,6 +105,7 @@ function App() {
             console.error(e);
             setChain(false);
          }
+         setAddress(window.ethereum.selectedAddress);
       } else {
          setInjected(false);
       }
@@ -166,6 +168,7 @@ function App() {
          // console.log(toSetAll[tkn]);
          return null;
       });
+      toSetAll.eth.vals.eth = toSetAll.eth.balance;
       console.log(toSetAll);
       // await setBalances(toSetAll);
       return toSetAll;
@@ -235,11 +238,13 @@ function App() {
                      </div>
                      <div className={classes.vSpace5}>
                         <Typography variant={"h3"}>
-                           Tokens Found Held by{" "}
-                           {window.ethereum.selectedAddress.slice(0, 6)}...
-                           {window.ethereum.selectedAddress.slice(
-                              window.ethereum.selectedAddress.length - 4
-                           )}
+                           Tokens Found Held{" "}
+                           {address !== ""
+                              ? ""
+                              : "by" +
+                                address.slice(0, 6) +
+                                "..." +
+                                address.slice(address.length - 4)}
                         </Typography>
                         <Grid
                            container

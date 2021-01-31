@@ -31,9 +31,30 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
+function sortLargestFirst(tkns) {
+   var retVal = Object.values(tkns);
+   return retVal.sort((a, b) => {
+      return b.vals.usd - a.vals.usd;
+   });
+}
+
+function getTotals(tkns) {
+   let usdReducer = (acc, curr) => {
+      return acc + curr.vals.usd;
+   };
+   let ethReducer = (acc, curr) => {
+      return acc + curr.vals.eth;
+   };
+   let usd = tkns.reduce(usdReducer, 0);
+   let eth = tkns.reduce(ethReducer, 0);
+   return { usd: usd, eth, eth };
+}
+
 const TokenCard = ({ className, tokens }) => {
    const classes = useStyles();
-
+   let sorted = sortLargestFirst(tokens);
+   let totals = getTotals(sorted);
+   console.log(totals);
    return (
       <Card className={clsx(className, classes.root)} elevation={3}>
          <CardContent>
