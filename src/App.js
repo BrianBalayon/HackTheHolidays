@@ -25,19 +25,57 @@ const useStyles = makeStyles((theme) => ({
 function App() {
    let classes = useStyles();
    let [balances, setBalances] = useState({});
+   let [injected, setInjected] = useState(true);
+   let [rightChain, setChain] = useState(true);
 
    let connect = async () => {
-      let ethereum = window.ethereum;
-      let web3 = window.web3;
       if (typeof ethereum !== "undefined") {
-         await ethereum.enable();
-         web3 = new Web3(ethereum);
-      } else if (typeof web3 !== "undefined") {
-         web3 = new Web3(web3.currentProvider);
+         let ethereum = window.ethereum;
+
+         ethereum.on("accountsChanged", (accounts) => {
+            // Handle the new accounts, or lack thereof.
+            // "accounts" will always be an array, but it can be empty.
+            window.location.reload();
+         });
+
+         ethereum.on("chainChanged", (chainId) => {
+            window.location.reload();
+         });
+
+         let chain = await ethereum.request({ method: "eth_chainId" });
+         if (chain !== "0x1") {
+            setChain(false);
+            return;
+         }
+
+         // MetaMask pop up
+         ethereum
+            .request({
+               method: "wallet_requestPermissions",
+               params: [{ eth_accounts: {} }],
+            })
+            .then((permissions) => {
+               const accountsPermission = permissions.find(
+                  (permission) => permission.parentCapability === "eth_accounts"
+               );
+               if (accountsPermission) {
+                  console.log(
+                     "eth_accounts permission successfully requested!"
+                  );
+               }
+            })
+            .catch((error) => {
+               if (error.code === 4001) {
+                  // EIP-1193 userRejectedRequest error
+                  console.log("Permissions needed to continue.");
+               } else {
+                  console.error(error);
+               }
+               setChain(false);
+            });
       } else {
-         web3 = new Web3(
-            new Web3.providers.HttpProvider(process.env.WEB3_PROVIDER)
-         );
+         setChain(false);
+         setInjected(false);
       }
    };
 
@@ -92,7 +130,7 @@ function App() {
             computed[c] = balances[tkn].balance * convs[c];
             // console.log(computed[c]);
          });
-         console.log(toSet);
+         // console.log(toSet);
          toSetAll[tkn] = { ...toSet, vals: computed };
       });
 
@@ -102,8 +140,10 @@ function App() {
 
    useEffect(async () => {
       await connect();
-      await GetBalances();
-      await calcValues();
+      if (rightChain) {
+         await GetBalances();
+         await calcValues();
+      }
    }, []);
 
    console.log(balances);
@@ -122,14 +162,6 @@ function App() {
                      If you see no tokens listed, you have to enable MetaMask to
                      connect.
                   </Typography>
-                  <Button
-                     onClick={async () => {
-                        await window.ethereum.request({
-                           method: "eth_requestAccounts",
-                        });
-                     }}>
-                     CONNECT
-                  </Button>
                </Box>
                {Object.keys(balances).map((tkn) => {
                   return <TokenCard token={balances[tkn]} />;
