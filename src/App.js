@@ -119,39 +119,37 @@ function App() {
                conv: vals[tkn],
             };
          });
+         toSet = await calcValues(toSet)
          setBalances(toSet);
       });
    };
 
-   const calcValues = async () => {
-      var toSetAll = { ...balances };
-
+   const calcValues = async (addVals) => {
+      var toSetAll = { ...addVals };
       Object.keys(toSetAll).map((tkn) => {
-         let toSet = balances[tkn];
          // Value in another currency
          var computed = {};
          // Other currencies
-         console.log(balances[tkn]);
-         let currency = Object.keys(balances[tkn].conv);
-         let convs = balances[tkn].conv;
-         console.log(currency);
+         // console.log(balances[tkn]);
+         let currency = Object.keys(toSetAll[tkn].conv);
+         var convs = toSetAll[tkn].conv;
+         // console.log(currency);
          currency.map((c) => {
-            computed[c] = balances[tkn].balance * convs[c];
-            // console.log(computed[c]);
+            computed[c] = toSetAll[tkn].balance * convs[c];
+            // console.log(convs[c]);
          });
-         // console.log(toSet);
-         toSetAll[tkn] = { ...toSet, vals: computed };
+         toSetAll[tkn] = { ...toSetAll[tkn], vals: computed };
+         // console.log(toSetAll[tkn]);
       });
-
-      setBalances(toSetAll);
       console.log(toSetAll);
+      // await setBalances(toSetAll);
+      return toSetAll;
    };
 
    const scan = async () => {
       await connect();
       if (rightChain) {
          await GetBalances();
-         await calcValues();
       }
    };
 
@@ -163,41 +161,40 @@ function App() {
       scan();
    }, [show]);
 
-   console.log(balances);
+   useEffect(async () => {
+   }, [balances]);
 
    return (
       <div className="App">
          <ThemeProvider theme={theme}>
             <Box className={classes.container}>
-               <Box className={classes.container}>
-                  <Typography variant={"h1"}>Token Recovery Tool </Typography>
-                  {injected && rightChain && (
-                     <div>
-                        <Typography variant={"body2"}>
-                           Scan for MetaMask supported ERC-20 tokens held by
-                           your address and add them to your watch list.
-                        </Typography>
-                     </div>
-                  )}
-                  {!injected && (
+               <Typography variant={"h1"}>Token Sweeper </Typography>
+               {injected && rightChain && (
+                  <div>
                      <Typography variant={"body2"}>
-                        Please download and enable MetaMask
+                        Scan for MetaMask supported ERC-20 tokens held by your
+                        address and add them to your watch list.
                      </Typography>
-                  )}
-                  {!rightChain && (
-                     <Typography variant={"body2"}>
-                        Please switch to the Ethereum Mainnet
-                     </Typography>
-                  )}
-                  <Button
-                     color={"primary"}
-                     variant={"contained"}
-                     onClick={() => {
-                        setShow(show + 1);
-                     }}>
-                     Scan for Tokens
-                  </Button>
-               </Box>
+                     <Button
+                        color={"primary"}
+                        variant={"contained"}
+                        onClick={() => {
+                           setShow(show + 1);
+                        }}>
+                        Scan for Tokens
+                     </Button>
+                  </div>
+               )}
+               {!injected && (
+                  <Typography variant={"body2"}>
+                     Please download and enable MetaMask
+                  </Typography>
+               )}
+               {!rightChain && (
+                  <Typography variant={"body2"}>
+                     Please switch to the Ethereum Mainnet
+                  </Typography>
+               )}
                {show > 0 &&
                   Object.keys(balances).map((tkn) => {
                      return <TokenCard token={balances[tkn]} />;

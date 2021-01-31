@@ -30,12 +30,14 @@ const TokenCard = ({ className, token }) => {
             <Typography variant={"body1"}>
                {token.balance} {token.symbol}
             </Typography>
+            {token.vals && (
+               <Typography variant={"body1"}>${token.vals.usd.toFixed(2) }</Typography>
+            )}
 
             {token.symbol !== "ETH" && (
                <Button
                   color="primary"
                   variant="contained"
-                  size="large"
                   startIcon={null}
                   onClick={() => {
                      try {

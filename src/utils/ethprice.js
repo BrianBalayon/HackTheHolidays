@@ -30,17 +30,17 @@ const getPrices = async function () {
    let response = axios.get(ETH_USD_URL);
 
    let unpacked = await response.then((response) => {
-      console.log(
-         "%c In unpacking: " + response.data.ethereum.usd,
-         "font-size: 18px; font-weight: bold"
-      );
+      // console.log(
+      //    "%c In unpacking: " + response.data.ethereum.usd,
+      //    "font-size: 18px; font-weight: bold"
+      // );
       return response.data.ethereum.usd;
    });
 
-   console.log(
-      "%c ETH to USD: " + unpacked,
-      "font-size: 18px; font-weight: bold"
-   );
+   // console.log(
+   //    "%c ETH to USD: " + unpacked,
+   //    "font-size: 18px; font-weight: bold"
+   // );
 
    return unpacked;
 };

@@ -35,14 +35,14 @@ const getPrices = async function (addresses) {
 
    // console.log(TOKEN_VAL_URL_P1 + addresses + TOKEN_VAL_URL_P2);
    let unpacked = await response.then((response) => {
-      console.log(
-         "%c In unpacking: " + Object.keys(response.data),
-         "font-size: 18px; font-weight: bold"
-      );
+      // console.log(
+      //    "%c In unpacking: " + Object.keys(response.data),
+      //    "font-size: 18px; font-weight: bold"
+      // );
       return response.data;
    });
 
-   console.log("%c Vals: " + unpacked, "font-size: 18px; font-weight: bold");
+   // console.log("%c Vals: " + unpacked, "font-size: 18px; font-weight: bold");
 
    return unpacked;
 };
