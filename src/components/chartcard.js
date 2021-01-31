@@ -15,6 +15,7 @@ import Chart from "./chart.js";
 const useStyles = makeStyles((theme) => ({
    root: {
       width: "85%",
+      margin: "auto",
    },
    card: {
       margin: theme.spacing(3),
