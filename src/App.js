@@ -6,7 +6,7 @@ import { useMetaMaskBalances } from "./utils/getbalances.js";
 import { theme } from "./theme";
 import TokenCard from "./components/tokencard.js";
 import getTknVals from "./utils/tknvals.js";
-import { Box, Typography, makeStyles, Button } from "@material-ui/core";
+import { Box, Typography, makeStyles, Button, setRef } from "@material-ui/core";
 import Web3 from "web3";
 
 const ethDets = { decimals: 18, name: "Ethereum", symbol: "ETH" };
@@ -27,54 +27,63 @@ function App() {
    let [balances, setBalances] = useState({});
    let [injected, setInjected] = useState(true);
    let [rightChain, setChain] = useState(true);
+   let [show, setShow] = useState(0);
+
+   let allow = async () => {
+      // MetaMask pop up
+      window.ethereum
+         .request({
+            method: "wallet_requestPermissions",
+            params: [{ eth_accounts: {} }],
+         })
+         .then((permissions) => {
+            const accountsPermission = permissions.find(
+               (permission) => permission.parentCapability === "eth_accounts"
+            );
+            if (accountsPermission) {
+               console.log("eth_accounts permission successfully requested!");
+               setInjected(true);
+            }
+         })
+         .catch((error) => {
+            if (error.code === 4001) {
+               // EIP-1193 userRejectedRequest error
+               console.log("Permissions needed to continue.");
+            } else {
+               console.error(error);
+            }
+            setInjected(false);
+         });
+   };
 
    let connect = async () => {
       if (typeof ethereum !== "undefined") {
-         let ethereum = window.ethereum;
+         try {
+            let ethereum = window.ethereum;
 
-         ethereum.on("accountsChanged", (accounts) => {
-            // Handle the new accounts, or lack thereof.
-            // "accounts" will always be an array, but it can be empty.
-            window.location.reload();
-         });
-
-         ethereum.on("chainChanged", (chainId) => {
-            window.location.reload();
-         });
-
-         let chain = await ethereum.request({ method: "eth_chainId" });
-         if (chain !== "0x1") {
-            setChain(false);
-            return;
-         }
-
-         // MetaMask pop up
-         ethereum
-            .request({
-               method: "wallet_requestPermissions",
-               params: [{ eth_accounts: {} }],
-            })
-            .then((permissions) => {
-               const accountsPermission = permissions.find(
-                  (permission) => permission.parentCapability === "eth_accounts"
-               );
-               if (accountsPermission) {
-                  console.log(
-                     "eth_accounts permission successfully requested!"
-                  );
-               }
-            })
-            .catch((error) => {
-               if (error.code === 4001) {
-                  // EIP-1193 userRejectedRequest error
-                  console.log("Permissions needed to continue.");
-               } else {
-                  console.error(error);
-               }
-               setChain(false);
+            ethereum.on("accountsChanged", (accounts) => {
+               // Handle the new accounts, or lack thereof.
+               // "accounts" will always be an array, but it can be empty.
+               window.location.reload();
             });
+
+            ethereum.on("chainChanged", (chainId) => {
+               window.location.reload();
+            });
+
+            let chain = await ethereum.request({ method: "eth_chainId" });
+            if (chain !== "0x1") {
+               throw "wrong chain";
+            }
+
+            if (show === 1) {
+               await allow();
+            }
+         } catch (e) {
+            console.error(e);
+            setChain(false);
+         }
       } else {
-         setChain(false);
          setInjected(false);
       }
    };
@@ -138,13 +147,21 @@ function App() {
       console.log(toSetAll);
    };
 
-   useEffect(async () => {
+   const scan = async () => {
       await connect();
       if (rightChain) {
          await GetBalances();
          await calcValues();
       }
-   }, []);
+   };
+
+   // useEffect(() => {
+   //    scan();
+   // }, []);
+
+   useEffect(async () => {
+      scan();
+   }, [show]);
 
    console.log(balances);
 
@@ -153,19 +170,38 @@ function App() {
          <ThemeProvider theme={theme}>
             <Box className={classes.container}>
                <Box className={classes.container}>
-                  <Typography variant={"h1"}>Token Recovery Tool</Typography>
-                  <Typography variant={"body2"}>
-                     Scan for MetaMask supported ERC-20 tokens held by your
-                     address and add them to your watch list.
-                  </Typography>
-                  <Typography variant={"body2"}>
-                     If you see no tokens listed, you have to enable MetaMask to
-                     connect.
-                  </Typography>
+                  <Typography variant={"h1"}>Token Recovery Tool </Typography>
+                  {injected && rightChain && (
+                     <div>
+                        <Typography variant={"body2"}>
+                           Scan for MetaMask supported ERC-20 tokens held by
+                           your address and add them to your watch list.
+                        </Typography>
+                     </div>
+                  )}
+                  {!injected && (
+                     <Typography variant={"body2"}>
+                        Please download and enable MetaMask
+                     </Typography>
+                  )}
+                  {!rightChain && (
+                     <Typography variant={"body2"}>
+                        Please switch to the Ethereum Mainnet
+                     </Typography>
+                  )}
+                  <Button
+                     color={"primary"}
+                     variant={"contained"}
+                     onClick={() => {
+                        setShow(show + 1);
+                     }}>
+                     Scan for Tokens
+                  </Button>
                </Box>
-               {Object.keys(balances).map((tkn) => {
-                  return <TokenCard token={balances[tkn]} />;
-               })}
+               {show > 0 &&
+                  Object.keys(balances).map((tkn) => {
+                     return <TokenCard token={balances[tkn]} />;
+                  })}
             </Box>
          </ThemeProvider>
       </div>
