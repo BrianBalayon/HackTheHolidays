@@ -8,7 +8,6 @@ import {
    Typography,
    Button,
    Grid,
-   Link,
    ButtonGroup,
 } from "@material-ui/core";
 import { addToWallet } from "../utils/addToWallet.js";
