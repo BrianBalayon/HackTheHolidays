@@ -6,9 +6,7 @@ import {
    Card,
    CardContent,
    Typography,
-   Button,
    Grid,
-   Link,
 } from "@material-ui/core";
 import Chart from "./chart.js";
 
@@ -17,8 +15,8 @@ const useStyles = makeStyles((theme) => ({
       width: "85%",
       margin: "auto",
    },
-   card: {
-      margin: theme.spacing(3),
+   hSpace: {
+      margin: theme.spacing(7),
    },
    vSpace: {
       marginTop: theme.spacing(1),
@@ -47,14 +45,35 @@ function getTotals(tkns) {
    };
    let usd = tkns.reduce(usdReducer, 0);
    let eth = tkns.reduce(ethReducer, 0);
-   return { usd: usd, eth, eth };
+   return { usd: usd, eth: eth };
 }
 
-const TokenCard = ({ className, tokens }) => {
+const TokenCard = ({ className, tokens, showFiat, showEth }) => {
    const classes = useStyles();
    let sorted = sortLargestFirst(tokens);
    let totals = getTotals(sorted);
-   console.log(totals);
+
+   if (totals.eth === 0) {
+      return <></>;
+   }
+   function getTop(tkns) {
+      var retVal = [];
+      for (var i = 0; i < 5 && i < tkns.length; i += 1) {
+         retVal.push(
+            <Typography
+               className={classes.vSpace}
+               align={"center"}
+               variant={"body1"}>
+               #{i + 1} {tkns[i].name} ({" "}
+               {((tkns[i].vals.eth / totals.eth) * 100).toFixed(2)}% )
+            </Typography>
+         );
+      }
+
+      return retVal;
+   }
+
+   //    console.log(totals);
    return (
       <Card className={clsx(className, classes.root)} elevation={3}>
          <CardContent>
@@ -62,11 +81,27 @@ const TokenCard = ({ className, tokens }) => {
             <Grid
                alignItems="center"
                container
-               direction="column"
-               item
-               justify="center"
-               xs={12}>
-               <Chart className={classes.center} tokens={tokens} />
+               direction="row"
+               justify="center">
+               <Grid item xs={12} md={5}>
+                  <Typography
+                     className={classes.vSpace2}
+                     align={"center"}
+                     variant={"h4"}>
+                     Top Holdings
+                  </Typography>
+                  {getTop(sorted)}
+               </Grid>
+               <Grid
+                  item
+                  xs={12}
+                  md={7}
+                  alignItems="center"
+                  container
+                  direction="row"
+                  justify="center">
+                  <Chart tokens={tokens} />
+               </Grid>
             </Grid>
          </CardContent>
       </Card>

@@ -2,7 +2,7 @@ import React from "react";
 import * as d3 from "d3";
 import { useTheme } from "@material-ui/core";
 
-const Chart = ({ className, tokens }) => {
+const Chart = ({ className, tokens, center }) => {
    let keys = Object.keys(tokens);
 
    if (keys.length === 1) {
@@ -34,7 +34,7 @@ const Slice = (props) => {
    let { pie } = props;
 
    //    let arc = d3.arc().innerRadius(85).outerRadius(100);
-   let arc = d3.arc().innerRadius(80).outerRadius(100);
+   let arc = d3.arc().innerRadius(75).outerRadius(100);
 
    let interpolate = d3.interpolateRgb(primary, secondary);
 

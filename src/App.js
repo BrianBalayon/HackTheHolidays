@@ -16,6 +16,7 @@ import {
    Grid,
 } from "@material-ui/core";
 import ChartCard from "./components/chartcard.js";
+import TrackChangesIcon from "@material-ui/icons/TrackChanges";
 
 const ethDets = { decimals: 18, name: "Ethereum", symbol: "ETH" };
 
@@ -36,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
    vSpace5: {
       marginTop: theme.spacing(5),
    },
+   hSpace: {
+      marginLeft: theme.spacing(3),
+   },
 }));
 
 function App() {
@@ -45,10 +49,15 @@ function App() {
    let [rightChain, setChain] = useState(true);
    let [show, setShow] = useState(0);
    let [showFiat, setShowFiat] = useState(false);
+   let [showEth, setShowEth] = useState(false);
    let [address, setAddress] = useState("");
 
-   const handleChangeShowMoney = () => {
+   const handleChangeShowFiat = () => {
       setShowFiat(!showFiat);
+   };
+
+   const handleChangeShowEth = () => {
+      setShowEth(!showEth);
    };
 
    let allow = async () => {
@@ -111,7 +120,7 @@ function App() {
       }
    };
 
-   let [ethUsdPrice] = useEthPrice();
+   var [ethUsdPrice] = useEthPrice();
 
    let tokensHeld = [];
 
@@ -144,7 +153,9 @@ function App() {
             };
             return null;
          });
-         toSet = await calcValues(toSet);
+         if (typeof toSet.eth != "undefined") {
+            toSet = await calcValues(toSet);
+         }
          setBalances(toSet);
       });
    };
@@ -169,7 +180,7 @@ function App() {
          return null;
       });
       toSetAll.eth.vals.eth = toSetAll.eth.balance;
-      console.log(toSetAll);
+      // console.log(toSetAll);
       // await setBalances(toSetAll);
       return toSetAll;
    };
@@ -185,41 +196,55 @@ function App() {
       scan();
    }, [show]);
 
-   useEffect(() => {}, [balances]);
+   useEffect(() => {}, [balances, showEth, showFiat, address]);
 
    return (
       <div className="App">
          <ThemeProvider theme={theme}>
             <Box className={classes.container}>
-               <Typography variant={"h1"}>Token Sweeper </Typography>
+               <Typography variant={"h1"}>Pocket Change </Typography>
                {injected && rightChain && (
-                  <div>
+                  <>
                      <Typography className={classes.vSpace} variant={"body2"}>
-                        Scan for MetaMask supported ERC-20 tokens held by your
+                        Look for MetaMask supported ERC-20 tokens held by your
                         address and add them to your watch list.
                      </Typography>
-                     <Button
-                        className={classes.vSpace}
-                        color={"primary"}
-                        variant={"contained"}
-                        onClick={() => {
-                           setShow(show + 1);
-                        }}>
-                        Scan for Tokens
-                     </Button>
-                     <FormControlLabel
-                        className={classes.vSpace}
-                        control={
-                           <Switch
-                              checked={showFiat}
-                              onChange={handleChangeShowMoney}
-                              name="Show Fiat Value"
-                              color="primary"
-                           />
-                        }
-                        label="Show Fiat Value"
-                     />
-                  </div>
+                     <div className={classes.vSpace}>
+                        <Button
+                           color={"primary"}
+                           variant={"contained"}
+                           startIcon={<TrackChangesIcon />}
+                           onClick={() => {
+                              setShow(show + 1);
+                           }}>
+                           Look for Tokens
+                        </Button>
+                        <FormControlLabel
+                           className={classes.hSpace}
+                           control={
+                              <Switch
+                                 checked={showEth}
+                                 onChange={handleChangeShowEth}
+                                 name="Show ETH Value"
+                                 color="primary"
+                              />
+                           }
+                           label="Show ETH Value"
+                        />
+                        <FormControlLabel
+                           className={classes.hSpace}
+                           control={
+                              <Switch
+                                 checked={showFiat}
+                                 onChange={handleChangeShowFiat}
+                                 name="Show Fiat Value"
+                                 color="primary"
+                              />
+                           }
+                           label="Show Fiat Value"
+                        />
+                     </div>
+                  </>
                )}
                {!injected && (
                   <Typography className={classes.vSpace} variant={"body2"}>
@@ -231,7 +256,7 @@ function App() {
                      Please switch to the Ethereum Mainnet
                   </Typography>
                )}
-               {show > 0 && (
+               {show > 0 && injected && rightChain && (
                   <>
                      <div className={classes.vSpace5}>
                         <ChartCard tokens={balances} />
@@ -256,6 +281,7 @@ function App() {
                                  <TokenCard
                                     key={k}
                                     showFiat={showFiat}
+                                    showEth={showEth}
                                     token={balances[tkn]}
                                  />
                               );

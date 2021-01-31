@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }));
 
-const TokenCard = ({ className, token, showFiat }) => {
+const TokenCard = ({ className, token, showFiat, showEth }) => {
    const classes = useStyles();
 
    return (
@@ -49,9 +49,9 @@ const TokenCard = ({ className, token, showFiat }) => {
 
                {token.symbol !== "ETH" && (
                   <>
-                     {token.vals && (
+                     {token.vals && showEth && (
                         <Typography color={"textSecondary"} variant={"body2"}>
-                           {token.vals.eth} ETH
+                           {token.vals.eth.toFixed(4)} ETH
                         </Typography>
                      )}
                      <ButtonGroup
